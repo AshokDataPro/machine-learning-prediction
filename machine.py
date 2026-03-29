@@ -14,6 +14,7 @@ df.columns = df.columns.str.strip()
 df = df.set_index("Date")
 df.index = pd.to_datetime(df.index, format="%d-%b-%y")
 print(df.head(10))
+print(df.tail(10))
 
 # --- Feature Engineering
 df["Close_next"] = df["Close"].shift(-1)
@@ -51,21 +52,28 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle
 
 # --- Scaled Ridge Regression Pipeline
 
+ 
+
+last_value = df.iloc[-1]['Close']  # adjust column name
 
 model = LinearRegression()
 model.fit(X_train, y_train)
 
 y_pred = model.predict(X_test)
-print(f"this is predict value {round(y_pred[0])}")
+
+print(f"Next predicted value from {last_value} is {round(y_pred[0])}")
 # --- Evaluation
 mae = mean_absolute_error(y_test, y_pred)
 mse = mean_squared_error(y_test, y_pred)
 r2 = r2_score(y_test, y_pred)
+ 
 
 print("🔍 Model Evaluation Metrics")
 print("MAE:", round(mae, 2))
 print("MSE:", round(mse, 2))
 print("R²:", round(r2, 4))
+showss=  last_value / y_pred[0] * 100
+print(showss.round(2))
 
 # --- Plot: Actual vs Predicted
 plt.figure(figsize=(14, 6))
@@ -84,7 +92,7 @@ plt.show()
 residuals = y_test - y_pred
 plt.figure(figsize=(10, 4))
 sns.histplot(residuals, bins=40, kde=True, color="purple")
-plt.title("🧠 Residual Distribution (Error = Actual - Predicted)")
+plt.title("Residual Distribution (Error = Actual - Predicted)")
 plt.xlabel("Residuals")
 plt.tight_layout()
 plt.show()
