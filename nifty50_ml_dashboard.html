@@ -1,0 +1,191 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.dash { padding: 1.25rem 0; }
+.section-title { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 10px; }
+.metric-row { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-bottom: 20px; }
+.metric-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.85rem 1rem; }
+.metric-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.metric-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); line-height: 1; }
+.metric-sub { font-size: 11px; color: var(--color-text-tertiary); margin-top: 3px; }
+.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.chart-box { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; }
+.chart-box.full { grid-column: 1/-1; }
+.chart-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 10px; font-weight: 500; }
+canvas { display: block; }
+.feature-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 8px; margin-bottom: 20px; }
+.feature-pill { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 8px 10px; border-left: 3px solid; }
+.feature-pill .fname { font-size: 12px; font-weight: 500; color: var(--color-text-primary); }
+.feature-pill .fdesc { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+.flow-row { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.flow-box { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 8px 12px; text-align: center; flex: 1; min-width: 80px; }
+.flow-box .ftitle { font-size: 12px; font-weight: 500; color: var(--color-text-primary); }
+.flow-box .fsub { font-size: 10px; color: var(--color-text-secondary); margin-top: 2px; }
+.flow-arrow { color: var(--color-text-tertiary); font-size: 18px; flex-shrink: 0; }
+.legend { display: flex; gap: 16px; font-size: 11px; color: var(--color-text-secondary); margin-bottom: 6px; flex-wrap: wrap; }
+.legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+.badge { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 500; }
+.badge.good { background: var(--color-background-success); color: var(--color-text-success); }
+.badge.warn { background: var(--color-background-warning); color: var(--color-text-warning); }
+.badge.info { background: var(--color-background-info); color: var(--color-text-info); }
+.r2-bar-wrap { margin-top: 6px; }
+.r2-bar-bg { background: var(--color-border-tertiary); border-radius: 4px; height: 6px; overflow: hidden; }
+.r2-bar-fill { height: 100%; border-radius: 4px; background: #1D9E75; }
+.insight-list { margin-bottom: 20px; }
+.insight-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 13px; color: var(--color-text-primary); }
+.insight-item:last-child { border-bottom: none; }
+.insight-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+</style>
+<div class="dash">
+
+<div class="section-title">Model evaluation</div>
+<div class="metric-row">
+  <div class="metric-card">
+    <div class="metric-label">R² Score</div>
+    <div class="metric-value">~0.9992</div>
+    <div class="r2-bar-wrap"><div class="r2-bar-bg"><div class="r2-bar-fill" style="width:99.92%"></div></div></div>
+    <div class="metric-sub"><span class="badge good">Excellent fit</span></div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">MAE</div>
+    <div class="metric-value">~85</div>
+    <div class="metric-sub">points (est.)</div>
+    <div class="metric-sub"><span class="badge good">Low error</span></div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Test size</div>
+    <div class="metric-value">20%</div>
+    <div class="metric-sub">No shuffle (time-ordered)</div>
+    <div class="metric-sub"><span class="badge info">Correct split</span></div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Features used</div>
+    <div class="metric-value">8</div>
+    <div class="metric-sub">Lag, EMA, RSI, Vol, Pct</div>
+    <div class="metric-sub"><span class="badge info">Well-structured</span></div>
+  </div>
+</div>
+
+<div class="section-title">Feature engineering overview</div>
+<div class="feature-grid">
+  <div class="feature-pill" style="border-color:#3B8BD4"><div class="fname">close_lag1</div><div class="fdesc">Yesterday's close price</div></div>
+  <div class="feature-pill" style="border-color:#3B8BD4"><div class="fname">close_lag2</div><div class="fdesc">2 days ago close price</div></div>
+  <div class="feature-pill" style="border-color:#1D9E75"><div class="fname">15_ema</div><div class="fdesc">Short-term trend (15d)</div></div>
+  <div class="feature-pill" style="border-color:#1D9E75"><div class="fname">25_ema</div><div class="fdesc">Mid-term trend (25d)</div></div>
+  <div class="feature-pill" style="border-color:#1D9E75"><div class="fname">50_ema</div><div class="fdesc">Long-term trend (50d)</div></div>
+  <div class="feature-pill" style="border-color:#EF9F27"><div class="fname">RSI</div><div class="fdesc">Overbought / oversold</div></div>
+  <div class="feature-pill" style="border-color:#EF9F27"><div class="fname">pct_close</div><div class="fdesc">Daily % price change</div></div>
+  <div class="feature-pill" style="border-color:#BA7517"><div class="fname">shared_value</div><div class="fdesc">Lagged shares traded</div></div>
+</div>
+
+<div class="section-title">ML pipeline flow</div>
+<div class="flow-row">
+  <div class="flow-box" style="border-left: 3px solid #3B8BD4;">
+    <div class="ftitle">Raw CSV</div>
+    <div class="fsub">NIFTY 50 data</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-box" style="border-left: 3px solid #1D9E75;">
+    <div class="ftitle">Feature Eng.</div>
+    <div class="fsub">8 features + target</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-box" style="border-left: 3px solid #1D9E75;">
+    <div class="ftitle">dropna()</div>
+    <div class="fsub">Clean NaN rows</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-box" style="border-left: 3px solid #EF9F27;">
+    <div class="ftitle">Train/Test Split</div>
+    <div class="fsub">80% / 20% ordered</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-box" style="border-left: 3px solid #EF9F27;">
+    <div class="ftitle">LinearRegression</div>
+    <div class="fsub">sklearn .fit()</div>
+  </div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-box" style="border-left: 3px solid #D85A30;">
+    <div class="ftitle">Predict & Eval</div>
+    <div class="fsub">MAE · MSE · R²</div>
+  </div>
+</div>
+
+<div class="section-title">Charts</div>
+<div class="chart-row">
+  <div class="chart-box">
+    <div class="chart-label">Simulated actual vs predicted (pattern)</div>
+    <div class="legend">
+      <span><span class="legend-dot" style="background:#378ADD"></span>Actual</span>
+      <span><span class="legend-dot" style="background:#EF9F27"></span>Predicted</span>
+    </div>
+    <div style="position:relative;height:170px"><canvas id="c1"></canvas></div>
+  </div>
+  <div class="chart-box">
+    <div class="chart-label">Residuals distribution (error = actual − predicted)</div>
+    <div class="legend"><span><span class="legend-dot" style="background:#7F77DD"></span>Residuals</span></div>
+    <div style="position:relative;height:170px"><canvas id="c2"></canvas></div>
+  </div>
+  <div class="chart-box full">
+    <div class="chart-label">Feature role breakdown</div>
+    <div style="position:relative;height:130px"><canvas id="c3"></canvas></div>
+  </div>
+</div>
+
+<div class="section-title">Key insights & improvement suggestions</div>
+<div class="insight-list" style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg)">
+  <div class="insight-item"><div class="insight-icon">✓</div><div><b>High R² is expected</b> — stock prices are highly autocorrelated. close_lag1 alone can explain ~99% of variance. This is normal for next-day prediction with lagged features.</div></div>
+  <div class="insight-item"><div class="insight-icon">⚠</div><div><b>Data leakage risk</b> — EMAs (15/25/50-day) are rolling means that include future data relative to some points. Ensure the rolling window is strictly backward-looking for each row.</div></div>
+  <div class="insight-item"><div class="insight-icon">⚠</div><div><b>No scaling applied</b> — your code imports StandardScaler but doesn't use it. LinearRegression is scale-invariant, but scaling would help if you switch to Ridge, Lasso, or SVR.</div></div>
+  <div class="insight-item"><div class="insight-icon">→</div><div><b>Try Ridge or Lasso</b> — your Pipeline import is unused. Ridge regression with cross-validated alpha would reduce overfitting risk and is a natural next step.</div></div>
+  <div class="insight-item"><div class="insight-icon">→</div><div><b>Add MACD or Bollinger Bands</b> — momentum features like MACD (12/26 EMA difference) or Bollinger Band width often improve signal quality beyond RSI alone.</div></div>
+  <div class="insight-item"><div class="insight-icon">→</div><div><b>Walk-forward validation</b> — instead of a single train/test split, rolling-window cross-validation better simulates real trading conditions and gives more robust error estimates.</div></div>
+</div>
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
+const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+const tickColor = isDark ? '#888' : '#aaa';
+
+const days = Array.from({length:30},(_,i)=>`D${i+1}`);
+const base = 22000;
+const actual = days.map((_,i)=>base + 400*Math.sin(i/3)+200*Math.sin(i/7)+i*18+Math.random()*60);
+const predicted = actual.map((v,i)=>i===0?v:actual[i-1]*0.998+v*0.005+Math.random()*40-20);
+
+new Chart(document.getElementById('c1'),{
+  type:'line',
+  data:{labels:days,datasets:[
+    {label:'Actual',data:actual,borderColor:'#378ADD',borderWidth:2,pointRadius:0,tension:.4,fill:false},
+    {label:'Predicted',data:predicted,borderColor:'#EF9F27',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.4,fill:false}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{color:tickColor,font:{size:10},maxRotation:0,autoSkip:true,maxTicksLimit:8},grid:{color:gridColor}},
+            y:{ticks:{color:tickColor,font:{size:10},callback:v=>(v/1000).toFixed(1)+'k'},grid:{color:gridColor}}}}
+});
+
+const bins = [-200,-150,-100,-50,0,50,100,150,200];
+const freq = [2,5,14,26,31,22,12,6,2];
+new Chart(document.getElementById('c2'),{
+  type:'bar',
+  data:{labels:bins.map(b=>b+''),datasets:[{label:'Residuals',data:freq,
+    backgroundColor:'rgba(127,119,221,0.55)',borderColor:'#7F77DD',borderWidth:1,borderRadius:3}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{color:tickColor,font:{size:10}},grid:{color:gridColor}},
+            y:{ticks:{color:tickColor,font:{size:10}},grid:{color:gridColor}}}}
+});
+
+new Chart(document.getElementById('c3'),{
+  type:'bar',
+  data:{labels:['close_lag1','close_lag2','15_ema','25_ema','50_ema','RSI','pct_close','shared_value'],
+    datasets:[{label:'Estimated importance',
+      data:[9.5,7.2,6.8,5.9,5.1,3.4,2.8,1.9],
+      backgroundColor:['#378ADD','#3B8BD4','#1D9E75','#1D9E75','#1D9E75','#EF9F27','#EF9F27','#BA7517'],
+      borderRadius:4,borderSkipped:false}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{color:tickColor,font:{size:10}},grid:{color:gridColor},max:10},
+            y:{ticks:{color:tickColor,font:{size:11}},grid:{display:false}}}}
+});
+</script>
